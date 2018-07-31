@@ -6,9 +6,9 @@ Encryption and Decryption of files using AES 256 and base 64 encoding on the fil
 2. dec.c
 
 #### Compiling : ####
-$ gcc enc.c -o enc -lcrypto
+$ gcc enc.c -o enc -lcrypto <br />
 $ gcc dec.c -o dec -lcrypto
 
 #### How to run ####
-Make a folder "test" in the same directory as the executable files. All files in the "test" folder and its subdirectories will be encrypted on running ./enc.
-The files will be decrypted on running ./dec.
+Make a folder "test" in the same directory as the executable files. All files in the "test" folder and its subdirectories will be encrypted on running ./enc <br />
+The files will be decrypted on running ./dec
