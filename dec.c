@@ -1,3 +1,8 @@
+/* 
+ * Author : Pratik Padalia
+ * Decrypts the encrypted files under the given folder
+ */
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,15 +16,15 @@ void ls_dir(char* start_path);
 
 void main()
 {
-        char* start_path;
-        start_path = "./test/";
-        ls_dir(start_path);
+	char* start_path;
+	start_path = "./test/";
+	ls_dir(start_path);
 }
 
 void ls_dir(char* start_path)
 {
 	unsigned char key[] = "12345678901234561234567890123456"; //32 chars long
-    unsigned char iv[] = "1234567890123456";//16 chars long
+	unsigned char iv[] = "1234567890123456";//16 chars long
 	DIR* dir;
 	struct dirent *ent;
 	if((dir=opendir(start_path)) !=NULL)
@@ -83,8 +88,6 @@ void ls_dir(char* start_path)
 void decryptfile(FILE * fpin,FILE* fpout,unsigned char* key, unsigned char* iv)
 {
 	//Using openssl EVP to encrypt a file
-
-
 	const unsigned bufsize = 4096; // bytes to read
 	unsigned char* read_buf = malloc(bufsize); // buffer to hold file text
 	unsigned char* cipher_buf ;// decrypted text
@@ -93,7 +96,8 @@ void decryptfile(FILE * fpin,FILE* fpout,unsigned char* key, unsigned char* iv)
 
 	EVP_CIPHER_CTX ctx;
 
-	EVP_CipherInit(&ctx,EVP_aes_256_cbc(),key,iv,0); // 0 = decrypt 	1= encrypt
+	// 0 = decrypt 	1= encrypt
+	EVP_CipherInit(&ctx,EVP_aes_256_cbc(),key,iv,0); 
 	blocksize = EVP_CIPHER_CTX_block_size(&ctx);
 	cipher_buf = malloc(bufsize+blocksize);
 
@@ -105,7 +109,8 @@ void decryptfile(FILE * fpin,FILE* fpout,unsigned char* key, unsigned char* iv)
 		fwrite(cipher_buf,sizeof(unsigned char),out_len,fpout);
 		if(bytes_read < bufsize)
 		{
-			break;//EOF
+			//EOF
+			break;
 		}
 	}
 
